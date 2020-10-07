@@ -196,11 +196,9 @@ int subr()
 int display_something()
 {
     int n;
-    XEvent event;
 
     /* flush event queue */
     XSelectInput(display, main_window, ExposureMask);
-    XNextEvent(display, &event);
 
     for (n = 0; n < 257; n++)
     {
@@ -260,7 +258,6 @@ char **argv;
     /* Display the window on the screen. */
     XMapWindow(display, main_window);
 
-    display_something();
     display_something();
 
     XSelectInput(display, main_window, KeyPressMask | ButtonPressMask);
