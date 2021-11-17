@@ -6,7 +6,7 @@ It plots the graph for cos(x) + 0.4cos(3x), from -1.5PI to +1.5PI, rotated in 3D
 
 At the time it took 1 hour and 40 minutes to plot out on the COCO 1.  On an APPLE-2 using a basic compiler (to eliminate the interpreter slowness) it ran in 40 minutes.  
 
-I then ported it to Turbo-C.  On a 286: 15 minutes.  On a 386: 5 minutes.  On a 486: under 2 minutes.  On a Pentium: a few seconds.
+I then ported it to Turbo-C.  On a 286: 8 minutes.  On a 386: 2 minutes.  On a 486: 15 seconds.  On a Pentium: ~3 seconds.
 
 After that it drew faster than the eye could see.  I ported it to Solaris Unix X11 in the early nineties and that's close to the version you see here.  I had to recover it from an old hard drive connected to a USB adapter.
 
