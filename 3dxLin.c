@@ -12,6 +12,8 @@
 /*
  * Constants
  */
+char WINDOW_NAME[] = __FILE__;
+char ICON_NAME[] = __FILE__;
 #define WINDOW_WIDTH 256
 #define WINDOW_HEIGHT 192
 
@@ -23,7 +25,7 @@ double m[257][2], xr = 0.0, xf = 0.0, yf = 0.0, zf = 0.0, zi = 0.0, zt = 0.0,
        zz = 0.0, xt = 0.0, yy = 0.0, t = 0.0, x2 = 0.0, y2 = 0.0, x1 = 0.0,
        y_one = 0.0, x_scale, y_scale, x_offset, y_offset;
 
-int subr(Display *display, int screen, Window window)
+int subr(Display *display, int screen, Window xwindow)
 {
     t = (yy - zz) * 0.9;
     i = (int)(((double)xx + zz + (double)p) * 0.7);
@@ -70,7 +72,7 @@ int subr(Display *display, int screen, Window window)
         return(0);
     }
 
-    (void)XDrawLine(display, window, DefaultGC(display, screen),
+    (void)XDrawLine(display, xwindow, DefaultGC(display, screen),
                     (int)(x2 * x_scale) + (int)x_offset, (int)y_offset - (int)(y2 * y_scale),
                     (int)(x1 * x_scale) + (int)x_offset, (int)y_offset - (int)(y_one * y_scale));
     XFlush(display);
@@ -80,7 +82,7 @@ int subr(Display *display, int screen, Window window)
     return(0);
 }
 
-int display_wave(Display *display, int screen, Window window)
+int plot_image(Display *display, int screen, Window xwindow)
 {
     int n;
 
@@ -117,7 +119,7 @@ int display_wave(Display *display, int screen, Window window)
                 xt = sqrt((double)(xi * xi) + (zt * zt)) * xf;
                 xx = xi;
                 yy = (cos(xt) + 0.4 * cos(3.0 * xt)) * yf;
-                (void)subr(display, screen, window);
+                (void)subr(display, screen, xwindow);
             }
         }
         x2 = 0.0;
@@ -133,9 +135,10 @@ int argc;
 char **argv;
 {
     Display *display;
-    Window window;
+    Window xwindow;
     XEvent event;
     int screen;
+    XSizeHints size_hints;
 
     display = XOpenDisplay(NULL);
     if (display == NULL)
@@ -145,17 +148,25 @@ char **argv;
     }
 
     screen = DefaultScreen(display);
-    window = XCreateSimpleWindow(display, RootWindow(display, screen), 10, 10, WINDOW_WIDTH, WINDOW_HEIGHT, 1,
+    xwindow = XCreateSimpleWindow(display, RootWindow(display, screen), 10, 10, WINDOW_WIDTH, WINDOW_HEIGHT, 1,
                             BlackPixel(display, screen), WhitePixel(display, screen));
-    XSelectInput(display, window, ExposureMask | KeyPressMask | ButtonPressMask);
-    XMapWindow(display, window);
+    /* set up the size hints for the window manager. */
+    size_hints.x = 10; size_hints.y = 10;
+    size_hints.width = WINDOW_WIDTH; size_hints.height = WINDOW_HEIGHT;
+    size_hints.flags = PPosition | PSize;
+    /* and state what hints are included. */
+    XSetStandardProperties(display, xwindow, WINDOW_NAME, ICON_NAME, None,   /* no icon map */
+                           argv, argc, &size_hints);
+
+    XSelectInput(display, xwindow, ExposureMask | KeyPressMask | ButtonPressMask);
+    XMapWindow(display, xwindow);
 
     while(1)
     {
         XNextEvent(display, &event);
         if (event.type == Expose)
         {
-            display_wave(display, screen, window);
+            plot_image(display, screen, xwindow);
         }
         if ((event.type == KeyPress) || (event.type == ButtonPress))
             break;
